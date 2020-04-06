@@ -17,9 +17,22 @@ class Chatroom {
         const response = await this.chats.add(chat);
         return response;
     }
+    getChat(callback) {
+        this.chats
+            .where('room', '==', this.room)
+            .orderBy('created_at')
+            .onSnapshot(snapshot => {
+                snapshot.docChanges().forEach(change => {
+                    if (change.type === 'added') {
+                        //update ui
+                        callback(change.doc.data());
+                    }
+                });
+            });
+    }
 }
 const chatroom = new Chatroom('gaming', 'shaun');
 
-chatroom.addChat('hello everyone')
-    .then(() => console.log('chat added'))
-    .catch(err => console.log(err));
+chatroom.getChat((data) => {
+    console.log(data);
+});
